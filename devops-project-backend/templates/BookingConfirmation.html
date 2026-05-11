@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Xác nhận đặt bàn</title>
+    </head>
+
+    <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial;">
+
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td align="center">
+
+                    <table width="600"
+                        style="background:#ffffff;margin-top:30px;border-radius:10px;overflow:hidden;">
+
+                        <tr>
+                            <td
+                                style="background:#198754;color:white;padding:20px;text-align:center;">
+                                <h1>Đặt bàn thành công</h1>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding:30px;">
+
+                                <h2>Xin chào {{CustomerName}},</h2>
+
+                                <p style="color:#555;">
+                                    Bạn đã đặt bàn thành công với thông tin:
+                                </p>
+
+                                <table width="100%"
+                                    style="margin-top:20px;border-collapse:collapse;">
+
+                                    <tr>
+                                        <td
+                                            style="padding:10px;border-bottom:1px solid #eee;">
+                                            <b>Bàn:</b>
+                                        </td>
+                                        <td
+                                            style="padding:10px;border-bottom:1px solid #eee;">
+                                            {{TableName}}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td
+                                            style="padding:10px;border-bottom:1px solid #eee;">
+                                            <b>Thời gian:</b>
+                                        </td>
+                                        <td
+                                            style="padding:10px;border-bottom:1px solid #eee;">
+                                            {{BookingTime}}
+                                        </td>
+                                    </tr>
+
+                                </table>
+
+                                <p style="margin-top:25px;color:#555;">
+                                    Vui lòng đến đúng giờ để đảm bảo trải nghiệm
+                                    tốt nhất.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                style="background:#f1f1f1;padding:20px;text-align:center;font-size:12px;color:#888;">
+                                Cuemasters Billiards
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>

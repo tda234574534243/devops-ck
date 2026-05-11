@@ -1,0 +1,85 @@
+# ========================================
+# Dependencies
+# ========================================
+node_modules/
+.npm-cache/
+.pnp/
+.pnp.js
+
+# ========================================
+# Build output
+# ========================================
+dist/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# ========================================
+# Environment & Secrets
+# ========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# ========================================
+# Logs
+# ========================================
+*.log
+*.stdout.log
+*.stderr.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-server.log
+dev-server.err.log
+
+# ========================================
+# Editor / IDE
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ========================================
+# OS generated files
+# ========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ========================================
+# Temp fix/test/debug scripts (dev only)
+# ========================================
+fix_*.cjs
+fix_*.js
+fix_*.py
+test*.cjs
+test*.js
+test_*.js
+update_*.py
+api_add.cs
+api_fix.patch
+dtoList.cs
+
+# ========================================
+# Development Plans (not for prod repo)
+# ========================================
+Plan/
+
+# ========================================
+# Metadata / cache
+# ========================================
+metadata.json
+.npmrc
+.env
