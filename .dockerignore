@@ -1,0 +1,48 @@
+# Ignore Git and GitHub workflow metadata
+.git
+.github
+
+# Node frontend
+devops-project-frontend/node_modules
+devops-project-frontend/dist
+devops-project-frontend/.vite
+devops-project-frontend/.env
+
+# .NET build outputs
+devops-project-backend/bin/
+devops-project-backend/obj/
+**/bin/
+**/obj/
+
+# Logs, temp, editor files
+*.log
+.env
+.env.*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.vs/
+
+# Package manager caches
+node_modules/
+/.npm
+/.yarn
+
+# Test output
+coverage/
+coverage-report/
+
+# Local build artifacts
+publish/
+dist/
+build/
+
+# OS files
+.DS_Store
+ehthumbs.db
+Icon
+
+# Docker build context exclusions
+Dockerfile*
+docker-compose*.yml
