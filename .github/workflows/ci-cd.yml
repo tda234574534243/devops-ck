@@ -55,7 +55,7 @@ jobs:
         working-directory: ${{ env.BACKEND_PATH }}
         run: |
           dotnet sonarscanner begin \
-            /k:"${{ github.repository }}" \
+            /k:"${{ github.event.repository.name }}" \
             /d:sonar.host.url="${{ env.SONAR_HOST_URL }}" \
             /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
