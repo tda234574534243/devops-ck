@@ -166,3 +166,4 @@ D:\Workspace\Lab2\devops\devops-project-backend\obj\Debug\net10.0\BilliardsBooki
 D:\Workspace\Lab2\devops\devops-project-backend\obj\Debug\net10.0\BilliardsBooking.API.genruntimeconfig.cache
 D:\Workspace\Lab2\devops\devops-project-backend\obj\Debug\net10.0\ref\BilliardsBooking.API.dll
 D:\Workspace\Lab2\devops\devops-project-backend\bin\Debug\net10.0\appsettings.json
+D:\Workspace\Lab2\devops\devops-project-backend\obj\Debug\net10.0\BilliardsBooking.API.sourcelink.json

@@ -39,6 +39,7 @@ publish/
 devops-project-frontend/node_modules/
 devops-project-frontend/dist/
 devops-project-frontend/.vite/
+devops-project-backend/obj/
 
 # Local env files
 .env
