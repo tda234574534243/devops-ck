@@ -199,6 +199,15 @@ jobs:
       - name: Verify Railway CLI
         run: railway --version
 
+      - name: Debug RAILWAY_TOKEN
+        run: |
+          if [ -z "${RAILWAY_TOKEN:-}" ]; then
+            echo "RAILWAY_TOKEN is empty"
+            exit 1
+          else
+            echo "RAILWAY_TOKEN length: ${#RAILWAY_TOKEN}"
+          fi
+
       - name: Deploy Backend
         working-directory: ${{ env.BACKEND_PATH }}
         run: railway up --service backend
