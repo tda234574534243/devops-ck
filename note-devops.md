@@ -1,17 +1,17 @@
 ```
-Developer Push Code
+Developer Push Code (check)
         ↓
-GitHub
+GitHub  (check)
         ↓
-GitHub Actions Pipeline
+GitHub Actions Pipeline (check)
         ↓
-Build
+Build (check)
         ↓
-Unit Test
+Unit Test (check)
         ↓
-Security Scan (SonarQube)
+Security Scan (SonarQube) (check)
         ↓
-Build Docker Image
+Build Docker Image (check)
         ↓
 Deploy Staging
         ↓
