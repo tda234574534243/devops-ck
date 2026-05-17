@@ -90,10 +90,15 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-
 
-      - name: Install dependencies
+      - name: Install dependencies (retry fallback for optional native deps)
         working-directory: ${{ env.FRONTEND_PATH }}
         run: |
-          npm ci --no-optional
+          set -e
+          npm ci || (
+            echo "npm ci failed — removing node_modules and package-lock.json and retrying with npm i"
+            rm -rf node_modules package-lock.json
+            npm i
+          )
           npm rebuild || true
 
       - name: Build
