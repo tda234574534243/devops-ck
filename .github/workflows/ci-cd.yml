@@ -56,6 +56,7 @@ jobs:
         run: |
           dotnet sonarscanner begin \
             /k:"${{ github.event.repository.name }}" \
+            /o:"${{ github.repository_owner }}" \
             /d:sonar.host.url="${{ env.SONAR_HOST_URL }}" \
             /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
