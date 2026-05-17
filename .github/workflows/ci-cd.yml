@@ -145,24 +145,28 @@ jobs:
           password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Build backend image
+        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         uses: docker/build-push-action@v5
         with:
-          context: ${{ env.BACKEND_PATH }}
-          file: ${{ env.BACKEND_PATH }}/Dockerfile
-          push: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-          tags: |
-            ${{ env.DOCKER_USERNAME }}/devops-backend:latest
-            ${{ env.DOCKER_USERNAME }}/devops-backend:${{ github.sha }}
+            context: ${{ env.BACKEND_PATH }}
+            file: ${{ env.BACKEND_PATH }}/Dockerfile
+            push: true
+            tags: |
+              ${{ env.DOCKER_USERNAME }}/devops-backend:latest
+              ${{ env.DOCKER_USERNAME }}/devops-backend:${{ github.sha }}
+
 
       - name: Build frontend image
+        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         uses: docker/build-push-action@v5
         with:
-          context: ${{ env.FRONTEND_PATH }}
-          file: ${{ env.FRONTEND_PATH }}/Dockerfile
-          push: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-          tags: |
-            ${{ env.DOCKER_USERNAME }}/devops-frontend:latest
-            ${{ env.DOCKER_USERNAME }}/devops-frontend:${{ github.sha }}
+            context: ${{ env.FRONTEND_PATH }}
+            file: ${{ env.FRONTEND_PATH }}/Dockerfile
+            push: true
+            tags: |
+              ${{ env.DOCKER_USERNAME }}/devops-frontend:latest
+              ${{ env.DOCKER_USERNAME }}/devops-frontend:${{ github.sha }}
+
 
       - name: Prepare build info
         run: |
