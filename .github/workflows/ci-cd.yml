@@ -90,26 +90,35 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-
 
-      - name: Install dependencies (retry fallback for optional native deps)
+      - name: Install dependencies (build native modules if needed)
         working-directory: ${{ env.FRONTEND_PATH }}
         run: |
-          set -e
+          set -euo pipefail
+          echo "Installing system build tools (for native addons)"
+          sudo apt-get update -y
+          sudo apt-get install -y python3 build-essential make g++ || true
+
+          echo "Forcing npm to build native modules from source"
+          export npm_config_build_from_source=true
+
+          echo "Running npm install (ci preferred)"
           npm ci || (
             echo "npm ci failed — removing node_modules and package-lock.json and retrying with npm i"
             rm -rf node_modules package-lock.json
             npm i
           )
-          npm rebuild || true
-          echo "Checking for rollup native bindings and installing if missing"
-          node -v && npm -v
-          ls -la node_modules | sed -n '1,200p' || true
+
+          echo "Rebuilding native addons from source"
+          npm rebuild --build-from-source || true
+
+          echo "Attempt to install platform-specific rollup native binding if still missing"
           arch=$(uname -m)
           if [ "$arch" = "x86_64" ]; then arch="x64"; fi
           os=$(uname -s | tr '[:upper:]' '[:lower:]')
           pkg="@rollup/rollup-${os}-${arch}-gnu"
           echo "Attempting to install $pkg"
           npm i "$pkg" --no-save || true
-          npm rebuild || true
+          npm rebuild --build-from-source || true
 
       - name: Build
         working-directory: ${{ env.FRONTEND_PATH }}
