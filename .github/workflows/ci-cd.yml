@@ -100,6 +100,16 @@ jobs:
             npm i
           )
           npm rebuild || true
+          echo "Checking for rollup native bindings and installing if missing"
+          node -v && npm -v
+          ls -la node_modules | sed -n '1,200p' || true
+          arch=$(uname -m)
+          if [ "$arch" = "x86_64" ]; then arch="x64"; fi
+          os=$(uname -s | tr '[:upper:]' '[:lower:]')
+          pkg="@rollup/rollup-${os}-${arch}-gnu"
+          echo "Attempting to install $pkg"
+          npm i "$pkg" --no-save || true
+          npm rebuild || true
 
       - name: Build
         working-directory: ${{ env.FRONTEND_PATH }}
