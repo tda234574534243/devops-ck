@@ -11,21 +11,25 @@ env:
   FRONTEND_PATH: devops-project-frontend
 
 jobs:
+
   backend:
     name: Build & Test Backend
     runs-on: ubuntu-latest
+
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Cache NuGet packages
         uses: actions/cache@v4
@@ -35,153 +39,138 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      - name: Restore
+      - name: Restore dependencies
         working-directory: ${{ env.BACKEND_PATH }}
         run: dotnet restore
 
-      - name: Build
+      # SONAR FLOW
+      - name: Install SonarScanner
+        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
+        run: |
+          dotnet tool install --global dotnet-sonarscanner --version 6.*
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: SonarQube Begin
+        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
+        working-directory: ${{ env.BACKEND_PATH }}
+        run: |
+          dotnet sonarscanner begin \
+            /k:"${{ github.repository }}" \
+            /d:sonar.host.url="${{ env.SONAR_HOST_URL }}" \
+            /d:sonar.token="${{ env.SONAR_TOKEN }}"
+
+      - name: Build backend
         working-directory: ${{ env.BACKEND_PATH }}
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run unit tests
+      - name: Run backend tests
         working-directory: ${{ env.BACKEND_PATH }}
         run: dotnet test --configuration Release --no-build --verbosity normal
 
-      - name: Install SonarScanner (for SonarQube)
-        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
-        run: |
-          dotnet tool install --global dotnet-sonarscanner --version 5.* || true
-          echo "Adding dotnet tools to PATH"
-          echo "##[add-path]$HOME/.dotnet/tools"
+      - name: Publish backend
+        working-directory: ${{ env.BACKEND_PATH }}
+        run: dotnet publish --configuration Release -o publish
 
-      - name: SonarQube begin
+      - name: SonarQube End
         if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
         working-directory: ${{ env.BACKEND_PATH }}
         run: |
-          export PATH="$HOME/.dotnet/tools:$PATH"
-          dotnet sonarscanner begin /k:"${{ github.repository }}" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN"
+          dotnet sonarscanner end \
+            /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
-      - name: SonarQube end
-        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
-        working-directory: ${{ env.BACKEND_PATH }}
-        run: |
-          dotnet build --configuration Release
-          export PATH="$HOME/.dotnet/tools:$PATH"
-          dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-publish
+          path: ${{ env.BACKEND_PATH }}/publish
 
   frontend:
     name: Build Frontend
     runs-on: ubuntu-latest
+
+    # FIX native binding issues
+    container:
+      image: node:20-bullseye
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+      - name: Verify Node version
+        run: node -v && npm -v
 
-      - name: Cache npm registry
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles(format('{0}/package-lock.json', env.FRONTEND_PATH)) }}
-          restore-keys: |
-            npm-${{ runner.os }}-
-
-      - name: Install dependencies (build native modules if needed)
+      # IMPORTANT:
+      # regenerate clean lockfile locally first if needed
+      - name: Install frontend dependencies
         working-directory: ${{ env.FRONTEND_PATH }}
-        run: |
-          set -euo pipefail
-          echo "Installing system build tools (for native addons)"
-          sudo apt-get update -y
-          sudo apt-get install -y python3 build-essential make g++ || true
+        run: npm ci
 
-          echo "Forcing npm to build native modules from source"
-          export npm_config_build_from_source=true
-
-          echo "Running npm install (ci preferred)"
-          npm ci || (
-            echo "npm ci failed — removing node_modules and package-lock.json and retrying with npm i"
-            rm -rf node_modules package-lock.json
-            npm i
-          )
-
-          echo "Rebuilding native addons from source"
-          npm rebuild --build-from-source || true
-
-          echo "Attempt to install platform-specific rollup native binding if still missing"
-          arch=$(uname -m)
-          if [ "$arch" = "x86_64" ]; then arch="x64"; fi
-          os=$(uname -s | tr '[:upper:]' '[:lower:]')
-          pkg="@rollup/rollup-${os}-${arch}-gnu"
-          echo "Attempting to install $pkg"
-          npm i "$pkg" --no-save || true
-          npm rebuild --build-from-source || true
-
-      - name: Build
+      - name: Build frontend
         working-directory: ${{ env.FRONTEND_PATH }}
-        run: npm run build --if-present
+        run: npm run build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: ${{ env.FRONTEND_PATH }}/dist
 
   docker:
-    name: Build & (optionally) Push Docker Images
+    name: Build & Push Docker Images
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+
+    needs:
+      - backend
+      - frontend
+
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout source
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to registry
+      - name: Login to Docker Hub
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
-          registry: ${{ env.DOCKER_REGISTRY || 'docker.io' }}
 
-      - name: Build and push backend image
-        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        uses: docker/build-push-action@v4
+      - name: Build backend image
+        uses: docker/build-push-action@v5
         with:
           context: ${{ env.BACKEND_PATH }}
           file: ${{ env.BACKEND_PATH }}/Dockerfile
-          push: true
+          push: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
           tags: |
-            ${{ env.DOCKER_REGISTRY || 'docker.io' }}/${{ github.repository }}:backend-${{ github.sha }}
-            ${{ env.DOCKER_REGISTRY || 'docker.io' }}/${{ github.repository }}:backend-latest
+            ${{ env.DOCKER_USERNAME }}/devops-backend:latest
+            ${{ env.DOCKER_USERNAME }}/devops-backend:${{ github.sha }}
 
-      - name: Build and push frontend image
-        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
-        uses: docker/build-push-action@v4
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
         with:
           context: ${{ env.FRONTEND_PATH }}
           file: ${{ env.FRONTEND_PATH }}/Dockerfile
-          push: true
+          push: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
           tags: |
-            ${{ env.DOCKER_REGISTRY || 'docker.io' }}/${{ github.repository }}:frontend-${{ github.sha }}
-            ${{ env.DOCKER_REGISTRY || 'docker.io' }}/${{ github.repository }}:frontend-latest
+            ${{ env.DOCKER_USERNAME }}/devops-frontend:latest
+            ${{ env.DOCKER_USERNAME }}/devops-frontend:${{ github.sha }}
 
-      - name: Prepare images-info
-        if: ${{ always() }}
+      - name: Prepare build info
         run: |
-          mkdir -p .github
-          echo "images-info placeholder" > .github/images-info || true
+          mkdir -p artifacts
+          echo "Build completed successfully" > artifacts/images-info.txt
 
-      - name: Upload built images info
-        if: ${{ always() }}
+      - name: Upload build info
         uses: actions/upload-artifact@v4
         with:
-          name: images-info
-          path: .github/images-info
+          name: docker-images-info
+          path: artifacts/images-info.txt
