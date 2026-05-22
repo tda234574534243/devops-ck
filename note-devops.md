@@ -13,7 +13,7 @@ Security Scan (SonarQube) (check)
         ↓
 Build Docker Image (check)
         ↓
-Deploy Staging
+Deploy Staging (check)
         ↓
 Monitoring + Logging
 ```
