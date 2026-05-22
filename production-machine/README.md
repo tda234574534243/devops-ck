@@ -138,3 +138,38 @@ Kiểm tra log cron chạy: `tail -n 200 /home/vagrant/app/deploy.log`.
 
 - File quan trọng: `/home/vagrant/app/deploy.sh`, `/home/vagrant/app/docker-compose.yml`, `/home/vagrant/app/nginx.conf`.
 ***Hết***
+
+## ELK — Logging & Monitoring (Elasticsearch / Logstash / Kibana / Filebeat)
+
+Tích hợp ELK đã được thêm vào `docker-compose.yml` để thu thập log container và server.
+
+- Files cấu hình:
+  - Logstash pipeline: `logstash/pipeline/logstash.conf`
+  - Filebeat config: `filebeat/filebeat.yml`
+
+- Ports mở:
+  - Elasticsearch: `9200`
+  - Kibana: `5601`
+  - Logstash Beats input: `5044`
+
+Khởi chạy toàn bộ stack (trong VM, thư mục `/home/vagrant/app`):
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Kiểm tra trạng thái dịch vụ:
+
+```bash
+docker compose ps
+docker compose logs -f elasticsearch
+docker compose logs -f kibana
+docker compose logs -f logstash
+docker compose logs -f filebeat
+```
+
+Truy cập Kibana trên `http://<vm-host-ip>:5601` (hoặc `http://localhost:5601` nếu port đã forward). Kibana sẽ hiển thị index `app-logs-*` do Logstash gửi tới Elasticsearch.
+
+Ghi chú: cấu hình hiện tại dùng `xpack.security.enabled=false` để chạy single-node đơn giản. Với môi trường production thật sự, hãy bật security, quản lý mật khẩu, và cấu hình resource (ES_JAVA_OPTS) phù hợp.
+
