@@ -90,7 +90,7 @@ docker compose up -d --remove-orphans
 
 ## Thay đổi cấu hình frontend (API URL)
 
-- Để tránh lỗi frontend gọi `http://localhost:5000` trên máy client, frontend nên sử dụng base path tương đối `/api`.
+- Để tránh lỗi frontend gọi `http://localhost:5000` trên máy client, frontend nên sử dụng base path Dockerfile tương đối `/api`.
 - Khi build image thủ công, bật `VITE_API_URL` như sau:
 
 ```bash
