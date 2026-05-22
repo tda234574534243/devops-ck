@@ -55,3 +55,4 @@ devops-project-backend/obj/
 .vagrant/
 deploy-runtime.log
 
+data/
