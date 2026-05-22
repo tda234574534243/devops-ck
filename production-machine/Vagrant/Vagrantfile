@@ -61,18 +61,17 @@ Vagrant.configure("2") do |config|
       fi
     fi
 
-    # Optional: create cron job to run deploy periodically if deploy.sh exists
-    if [ -f /home/vagrant/app/deploy.sh ]; then
-      cat > /etc/cron.d/devops-deploy <<'CRON'
+    # Ensure cron job exists to run deploy script periodically.
+    # The cron line will only execute deploy.sh if it is executable.
+    cat > /etc/cron.d/devops-deploy <<'CRON'
 SHELL=/bin/bash
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin
 
-*/5 * * * * vagrant /home/vagrant/app/deploy.sh >> /home/vagrant/app/deploy.log 2>&1
+*/5 * * * * vagrant [ -x /home/vagrant/app/deploy.sh ] && /home/vagrant/app/deploy.sh >> /home/vagrant/app/deploy.log 2>&1
 CRON
-      chmod 644 /etc/cron.d/devops-deploy || true
-      systemctl enable cron || true
-      systemctl restart cron || true
-    fi
+    chmod 644 /etc/cron.d/devops-deploy || true
+    systemctl enable cron || true
+    systemctl restart cron || true
 
   SHELL
 
