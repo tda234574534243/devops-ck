@@ -50,3 +50,8 @@ devops-project-backend/obj/
 
 # JetBrains Rider
 .idea/
+
+#Vagrant
+.vagrant/
+deploy-runtime.log
+

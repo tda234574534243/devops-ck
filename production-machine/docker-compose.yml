@@ -1,0 +1,76 @@
+services:
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong@Passw0rd"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q 'SELECT 1' -C"
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    networks:
+      - app-network
+
+  backend:
+    image: m4nw1thp3nt35t/devops-backend:latest
+    container_name: backend
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=BilliardsBookingDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
+    depends_on:
+      db:
+        condition: service_healthy
+    # Sửa healthcheck dùng cơ chế mở luồng TCP của Linux thay vì curl
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n' >&3 && cat <&3 | grep -q 'HTTP/1.1' || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - app-network
+
+  frontend:
+    image: m4nw1thp3nt35t/devops-frontend:latest
+    container_name: frontend
+    restart: unless-stopped
+    # Gỡ bỏ phần ports: "80:80" cũ ra, nhường cổng 80 ngoài máy ảo cho Nginx
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  # THÊM MỚI SERVICE NGINX Ở ĐÂY
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "5000:5000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro # Ánh xạ file cấu hình vừa tạo vào container
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  sqlserver_data:
+
+networks:
+  app-network:
+    driver: bridge
