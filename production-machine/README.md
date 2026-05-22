@@ -59,7 +59,8 @@ cd /home/vagrant/app
   - chạy `docker compose up -d --remove-orphans`
   - `docker image prune -af` để dọn ảnh không dùng
 
-- Cron job (nếu được tạo) chạy `deploy.sh` mỗi 5 phút theo cấu hình trong `/etc/cron.d/devops-deploy`.
+- Cron job chạy `deploy.sh` một lần mỗi giờ (lúc phút 0) theo cấu hình trong `/etc/cron.d/devops-deploy`.
+  - Vagrant provision hiện tạo file cron này và cron chỉ chạy `deploy.sh` nếu file đó có quyền thực thi.
 
 ## Các lệnh hữu ích trong VM
 
@@ -111,7 +112,23 @@ docker build -t my-frontend:latest --build-arg VITE_API_URL=/api .
 
 - Lỗi trên trình duyệt `ERR_CONNECTION_REFUSED` khi frontend cố gọi `localhost:5000`: do frontend dùng URL cố định `localhost` — build lại frontend với `VITE_API_URL=/api` hoặc cấu hình Nginx để proxy.
 - Backend container unhealthy: kiểm tra `docker compose logs backend` và healthcheck; đảm bảo SQL Server sẵn sàng.
-- Nếu cron không chạy: kiểm tra `systemctl status cron` và quyền file `/etc/cron.d/devops-deploy`.
+-- Nếu cron không chạy: kiểm tra `systemctl status cron` và quyền file `/etc/cron.d/devops-deploy`.
+-- Tạo hoặc cập nhật cron nhanh trong VM (không cần reprovision):
+
+```bash
+sudo tee /etc/cron.d/devops-deploy > /dev/null <<'CRON'
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin
+
+0 * * * * vagrant [ -x /home/vagrant/app/deploy.sh ] && /home/vagrant/app/deploy.sh >> /home/vagrant/app/deploy.log 2>&1
+CRON
+
+sudo chmod 644 /etc/cron.d/devops-deploy
+sudo systemctl restart cron
+sudo systemctl status cron --no-pager
+```
+
+Kiểm tra log cron chạy: `tail -n 200 /home/vagrant/app/deploy.log`.
 
 ## Thay đổi nâng cao
 
