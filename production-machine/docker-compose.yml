@@ -35,6 +35,9 @@ services:
       MailSettings__Password: "${MAIL_PASSWORD}"
       MailSettings__SenderEmail: "${MAIL_SENDER_EMAIL}"
       MailSettings__DisplayName: "${MAIL_DISPLAY_NAME}"
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft.AspNetCore: "Warning"
+      Logging__LogLevel__Microsoft.EntityFrameworkCore.Database.Command: "Warning"
     depends_on:
       db:
         condition: service_healthy
