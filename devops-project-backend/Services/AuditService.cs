@@ -20,10 +20,12 @@ namespace BilliardsBooking.API.Services
     public class AuditService : IAuditService
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<AuditService> _logger;
 
-        public AuditService(AppDbContext context)
+        public AuditService(AppDbContext context, ILogger<AuditService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task LogAsync(
@@ -60,8 +62,13 @@ namespace BilliardsBooking.API.Services
             }
             catch (Exception ex)
             {
-                // Audit logging must not break primary flows. Log to console as a fallback.
-                try { Console.WriteLine("AuditService.LogAsync failed: " + ex.ToString()); } catch { }
+                // Audit logging must not break primary flows.
+                _logger.LogError(
+                    ex,
+                    "Failed to persist audit log for action {Action} on {EntityType} {EntityId}.",
+                    action,
+                    entityType,
+                    entityId);
             }
         }
     }
