@@ -34,7 +34,7 @@ namespace BilliardsBooking.API.Middleware
 
                 _logger.Log(
                     logLevel,
-                    "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMilliseconds} ms. TraceId={TraceId} UserId={UserId} RemoteIp={RemoteIp}",
+                    "HTTP request completed. Method={Method} Path={Path} StatusCode={StatusCode} ElapsedMilliseconds={ElapsedMilliseconds} TraceId={TraceId} UserId={UserId} RemoteIp={RemoteIp}",
                     context.Request.Method,
                     context.Request.Path.Value,
                     statusCode,
@@ -49,7 +49,7 @@ namespace BilliardsBooking.API.Middleware
 
                 _logger.LogError(
                     ex,
-                    "HTTP {Method} {Path} failed after {ElapsedMilliseconds} ms. TraceId={TraceId} UserId={UserId} RemoteIp={RemoteIp}",
+                    "HTTP request failed. Method={Method} Path={Path} ElapsedMilliseconds={ElapsedMilliseconds} TraceId={TraceId} UserId={UserId} RemoteIp={RemoteIp}",
                     context.Request.Method,
                     context.Request.Path.Value,
                     stopwatch.ElapsedMilliseconds,

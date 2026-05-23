@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BilliardsBooking.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a166ad9079fb2957903fe546d0d4eb27089abe2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3c5e24d8dc723baa6876c42d2ce813f527704fd")]
 [assembly: System.Reflection.AssemblyProductAttribute("BilliardsBooking.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BilliardsBooking.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
