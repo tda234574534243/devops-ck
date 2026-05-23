@@ -29,6 +29,12 @@ services:
     restart: unless-stopped
     environment:
       ConnectionStrings__DefaultConnection: "Server=db,1433;Database=BilliardsBookingDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
+      MailSettings__Host: "${MAIL_HOST}"
+      MailSettings__Port: "${MAIL_PORT}"
+      MailSettings__Username: "${MAIL_USERNAME}"
+      MailSettings__Password: "${MAIL_PASSWORD}"
+      MailSettings__SenderEmail: "${MAIL_SENDER_EMAIL}"
+      MailSettings__DisplayName: "${MAIL_DISPLAY_NAME}"
     depends_on:
       db:
         condition: service_healthy
