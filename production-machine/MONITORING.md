@@ -84,3 +84,36 @@ Suggested dashboard panels:
 - Slow requests where `event.duration_ms > 1000`
 - Top slow endpoints grouped by `url.path`
 - Status code distribution grouped by `http.response.status_code`
+
+## Level 3: Elastic Stack Monitoring
+
+Elastic Stack monitoring is enabled for:
+
+- Elasticsearch internal collection
+- Kibana container UI mode
+- Logstash monitoring output
+- Filebeat monitoring output
+
+Open Kibana:
+
+```text
+http://localhost:5601
+```
+
+Then go to:
+
+```text
+Stack Monitoring
+```
+
+Useful checks:
+
+```bash
+docker compose ps
+```
+
+```bash
+curl http://localhost:9200/_cat/indices/.monitoring-*?v
+```
+
+Expected result: `.monitoring-*` indices should appear after the stack has been running for a short time.

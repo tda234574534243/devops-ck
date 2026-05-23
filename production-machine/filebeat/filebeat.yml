@@ -13,6 +13,10 @@ processors:
 output.logstash:
   hosts: ["logstash:5044"]
 
+monitoring.enabled: true
+monitoring.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+
 setup.kibana:
   host: "kibana:5601"
 

@@ -101,6 +101,7 @@ services:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=true
     ulimits:
       memlock:
         soft: -1
@@ -125,6 +126,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - SERVER_NAME=kibana
+      - MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=true
     ports:
       - "5601:5601"
     depends_on:
@@ -139,10 +141,26 @@ services:
     networks:
       - app-network
 
+  elasticsearch-setup:
+    image: curlimages/curl:8.11.1
+    container_name: elasticsearch_setup
+    restart: "no"
+    volumes:
+      - ./elasticsearch/init-templates.sh:/init-templates.sh:ro
+    command: ["sh", "/init-templates.sh"]
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - app-network
+
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.1
     container_name: logstash
     restart: unless-stopped
+    environment:
+      - XPACK_MONITORING_ENABLED=true
+      - XPACK_MONITORING_ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
     ports:
@@ -152,8 +170,8 @@ services:
       # external access to Logstash TCP input, map to a different
       # host port like "5001:5000" instead of exposing 5000 directly.
     depends_on:
-      elasticsearch:
-        condition: service_healthy
+      elasticsearch-setup:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9600/_node/pipelines >/dev/null || exit 1"]
       interval: 20s
