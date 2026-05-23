@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eu
+set -e
 
 until curl -fsS http://elasticsearch:9200/_cluster/health >/dev/null; do
   sleep 5
@@ -17,7 +17,7 @@ curl -fsS -X PUT http://elasticsearch:9200/_index_template/app-logs-single-node 
     }
   }'
 
-curl -fsS -X PUT http://elasticsearch:9200/app-logs-*/_settings \
+curl -fsS -X PUT 'http://elasticsearch:9200/app-logs-*/_settings?ignore_unavailable=true&allow_no_indices=true' \
   -H 'Content-Type: application/json' \
   -d '{
     "index": {
