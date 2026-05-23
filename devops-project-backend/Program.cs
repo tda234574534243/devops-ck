@@ -1,4 +1,5 @@
 using BilliardsBooking.API.Data;
+using BilliardsBooking.API.Middleware;
 using BilliardsBooking.API.Models;
 using BilliardsBooking.API.DTOs;
 using BilliardsBooking.API.Services;
@@ -140,6 +141,7 @@ app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 app.MapControllers();
 app.MapHub<BilliardsBooking.API.Hubs.TableStatusHub>("/hubs/tablestatus");
 
