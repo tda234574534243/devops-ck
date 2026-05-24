@@ -56,3 +56,7 @@ devops-project-backend/obj/
 deploy-runtime.log
 
 data/
+
+# .NET test results
+**/TestResults/
+**/coverage.cobertura.xml
