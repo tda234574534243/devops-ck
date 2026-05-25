@@ -15,6 +15,6 @@ Build Docker Image (check)
         ↓
 Deploy Staging (check)
         ↓
-Monitoring + Logging
+Monitoring + Logging (check)
 ```
     
