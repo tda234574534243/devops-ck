@@ -30,7 +30,7 @@ public sealed class BookingServiceTests
     private sealed class FakeTableSessionService : ITableSessionService
     {
         private readonly TableSession? _sessionToReturn;
-        private readonly List<LinkableCoachSessionResponse>? _linkableCoachSessions;
+        // private readonly List<LinkableCoachSessionResponse>? _linkableCoachSessions;
 
         public FakeTableSessionService(TableSession? sessionToReturn = null, List<LinkableCoachSessionResponse>? linkableCoachSessions = null)
         {
@@ -65,11 +65,11 @@ public sealed class BookingServiceTests
         var reservation = new Reservation
         {
             Id = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
+            userid = Guid.NewGuid(),
             BookingDate = DateTime.UtcNow.Date,
             StartTime = TimeSpan.FromHours(10),
             EndTime = TimeSpan.FromHours(11),
-            Status = ReservationStatus.Pending,
+            Status = ReservationStatus.Bending,
             CreatedAt = DateTime.UtcNow
         };
 
