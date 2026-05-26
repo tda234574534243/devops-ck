@@ -129,7 +129,6 @@ jobs:
     needs:
       - backend
       - frontend
-    runs-on: ubuntu-latest
 
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
