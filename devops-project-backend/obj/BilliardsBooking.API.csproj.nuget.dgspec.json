@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\StudySpace\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj": {}
+    "D:\\Projects\\Website\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj": {}
   },
   "projects": {
-    "D:\\StudySpace\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj": {
+    "D:\\Projects\\Website\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\StudySpace\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj",
+        "projectUniqueName": "D:\\Projects\\Website\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj",
         "projectName": "BilliardsBooking.API",
-        "projectPath": "D:\\StudySpace\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj",
-        "packagesPath": "C:\\Users\\THIS PC\\.nuget\\packages\\",
-        "outputPath": "D:\\StudySpace\\devops-ck\\devops-project-backend\\obj\\",
+        "projectPath": "D:\\Projects\\Website\\devops-ck\\devops-project-backend\\BilliardsBooking.API.csproj",
+        "packagesPath": "C:\\Users\\truon\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\Website\\devops-ck\\devops-project-backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\THIS PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\truon\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
