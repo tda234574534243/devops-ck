@@ -7,7 +7,7 @@ import { authService } from '../services/authService';
 import { useAuthStore } from '../stores/authStore';
 import { createGoogleAuthorizationUrl, getGoogleClientId } from '../utils/googleOAuth';
 
-export default function Login({ onNavigate }: ScreenProps) {
+export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as { message?: string } | null;
@@ -153,7 +153,7 @@ export default function Login({ onNavigate }: ScreenProps) {
             className="w-full rounded-full bg-primary py-4 font-bold tracking-[-0.01em] text-on-primary shadow-lg shadow-primary/10 transition-all duration-300 active:scale-95 hover:bg-primary-container"
             type="submit"
           >
-            Đăng nhập
+            Đăng nhập hệ thống CueMasters
           </button>
         </form>
 
@@ -188,7 +188,7 @@ export default function Login({ onNavigate }: ScreenProps) {
           Chưa có tài khoản?
           <button
             type="button"
-            onClick={() => onNavigate('register')}
+            onClick={() => navigate('/register')}
             className="ml-1 font-bold text-primary underline-offset-4 hover:underline"
           >
             Đăng ký ngay
