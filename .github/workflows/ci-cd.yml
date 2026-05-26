@@ -125,9 +125,11 @@ jobs:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
 
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - backend
       - frontend
+    runs-on: ubuntu-latest
 
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
