@@ -2,16 +2,16 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   BACKEND_PATH: devops-project-backend
+  BACKEND_TEST_PATH: devops-project-backend.Tests
   FRONTEND_PATH: devops-project-frontend
 
 jobs:
-
   backend:
     name: Build & Test Backend
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          global-json-file: global.json
 
       - name: Cache NuGet packages
         uses: actions/cache@v4
@@ -60,13 +60,18 @@ jobs:
             /d:sonar.host.url="${{ env.SONAR_HOST_URL }}" \
             /d:sonar.token="${{ env.SONAR_TOKEN }}"
 
+      - name: Restore backend
+        run: dotnet restore ${{ env.BACKEND_PATH }}/BilliardsBooking.API.csproj
+
+      - name: Restore backend tests
+        run: dotnet restore ${{ env.BACKEND_TEST_PATH }}/BilliardsBooking.API.Tests.csproj
+
       - name: Build backend
         working-directory: ${{ env.BACKEND_PATH }}
         run: dotnet build --configuration Release --no-restore
 
       - name: Run backend tests
-        working-directory: ${{ env.BACKEND_PATH }}
-        run: dotnet test --configuration Release --no-build --verbosity normal
+        run: dotnet test ${{ env.BACKEND_TEST_PATH }}/BilliardsBooking.API.Tests.csproj --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
 
       - name: Publish backend
         working-directory: ${{ env.BACKEND_PATH }}
@@ -120,9 +125,11 @@ jobs:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
 
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - backend
       - frontend
+    runs-on: ubuntu-latest
 
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -149,25 +156,23 @@ jobs:
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         uses: docker/build-push-action@v5
         with:
-            context: ${{ env.BACKEND_PATH }}
-            file: ${{ env.BACKEND_PATH }}/Dockerfile
-            push: true
-            tags: |
-              ${{ env.DOCKER_USERNAME }}/devops-backend:latest
-              ${{ env.DOCKER_USERNAME }}/devops-backend:${{ github.sha }}
-
+          context: ${{ env.BACKEND_PATH }}
+          file: ${{ env.BACKEND_PATH }}/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/devops-backend:latest
+            ${{ env.DOCKER_USERNAME }}/devops-backend:${{ github.sha }}
 
       - name: Build frontend image
         if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         uses: docker/build-push-action@v5
         with:
-            context: ${{ env.FRONTEND_PATH }}
-            file: ${{ env.FRONTEND_PATH }}/Dockerfile
-            push: true
-            tags: |
-              ${{ env.DOCKER_USERNAME }}/devops-frontend:latest
-              ${{ env.DOCKER_USERNAME }}/devops-frontend:${{ github.sha }}
-
+          context: ${{ env.FRONTEND_PATH }}
+          file: ${{ env.FRONTEND_PATH }}/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/devops-frontend:latest
+            ${{ env.DOCKER_USERNAME }}/devops-frontend:${{ github.sha }}
 
       - name: Prepare build info
         run: |
@@ -179,4 +184,3 @@ jobs:
         with:
           name: docker-images-info
           path: artifacts/images-info.txt
- 

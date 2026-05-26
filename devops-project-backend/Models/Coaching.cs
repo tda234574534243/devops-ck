@@ -26,7 +26,7 @@ namespace BilliardsBooking.API.Models
     {
         public int Id { get; set; }
         
-        public Guid COACHID { get; set; }
+        public Guid CoachId { get; set; }
         public Coach? Coach { get; set; }
 
         public DayOfWeek DayOfWeek { get; set; }
