@@ -114,6 +114,9 @@ docker compose ps
 
 ```bash
 curl http://localhost:9200/_cat/indices/.monitoring-*?v
+curl http://localhost:9200/_cat/indices/app-logs-*?v
+curl "http://localhost:9200/app-logs-*/_search?pretty&size=3"
+curl "http://localhost:9200/app-logs-*/_mapping?pretty"
 ```
 
 Expected result: `.monitoring-*` indices should appear after the stack has been running for a short time.
